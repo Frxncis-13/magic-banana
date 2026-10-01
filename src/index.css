@@ -4,6 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
+.footer-setup p { margin: 0 0 16px; color: #747782; font-size: 11px; line-height: 1.8; }
+
 :root { font-family: 'Manrope', sans-serif; color: #0a0a14; background: #fff; font-synthesis: none; text-rendering: optimizeLegibility; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
