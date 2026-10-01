@@ -1,4 +1,3 @@
-import { FormEvent, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
@@ -35,16 +34,13 @@ const pipeline = [
 ];
 
 function App() {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const submitted = new URLSearchParams(window.location.search).get('beta') === 'submitted';
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!email.trim() || !event.currentTarget.reportValidity()) return;
-    const subject = encodeURIComponent('Magic Banana beta invite request');
-    const body = encodeURIComponent(`Please add ${email.trim()} to the Magic Banana beta list.`);
-    window.location.href = `mailto:${betaContact}?subject=${subject}&body=${body}`;
-    setSubmitted(true);
+  function setConfirmationRedirect(form: HTMLFormElement) {
+    const nextField = form.elements.namedItem('_next');
+    if (nextField instanceof HTMLInputElement) {
+      nextField.value = `${window.location.origin}/?beta=submitted#beta`;
+    }
   }
 
   return (
@@ -64,12 +60,15 @@ function App() {
         <div className="hero-tag"><span className="tag-dot" /> HOMEWORK, MEET YOUR MATCH <span className="tag-line" /></div>
         <h1>Point. Scan.<br /><span>Understand.</span></h1>
         <p className="hero-copy">Magic Banana ruthlessly strips away academic filler sentences and translates confusing textbooks into 30-second toddler analogies and addictive study games. Engineered for when you are running on 3 hours of sleep and need to pass the exam in 10 minutes.</p>
-        <form className="beta-form" onSubmit={handleSubmit}>
+        <form className="beta-form" action={`https://formsubmit.co/${betaContact}`} method="POST" onSubmit={(event) => setConfirmationRedirect(event.currentTarget)}>
           <label className="sr-only" htmlFor="student-email">Student email</label>
-          <input id="student-email" type="email" required value={email} onChange={(event) => { setEmail(event.target.value); setSubmitted(false); }} placeholder="Enter your student email..." />
-          <button type="submit">{submitted ? 'Request ready in email' : 'Request a beta invite'} <span>⚡</span></button>
+          <input id="student-email" type="email" name="email" autoComplete="email" required placeholder="Enter your student email..." />
+          <input type="hidden" name="_subject" value="New Magic Banana beta signup" />
+          <input type="hidden" name="_autoresponse" value="Thanks for requesting a Magic Banana beta invite! We received your signup and will send updated app access details when available." />
+          <input type="hidden" name="_next" value="" />
+          <button type="submit" disabled={submitted}>{submitted ? 'Request received' : 'Request a beta invite'} <span>⚡</span></button>
         </form>
-        <p className={`form-note ${submitted ? 'success-note' : ''}`} aria-live="polite">{submitted ? <><Check size={14} /> Send the prefilled email to request your invite.</> : 'No spam. Just your invite when the next study sprint opens.'}</p>
+        <p className={`form-note ${submitted ? 'success-note' : ''}`} aria-live="polite">{submitted ? <><Check size={14} /> Signup received. Check your inbox for a confirmation email.</> : 'No spam. Just your invite when the next study sprint opens.'}</p>
         <div className="hero-stats" aria-label="Product highlights"><span><Sparkles size={15} /> Built for curious minds</span><i /> <span>30-second explanations</span><i /> <span>Zero judgement</span></div>
       </section>
 
